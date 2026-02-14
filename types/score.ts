@@ -23,6 +23,25 @@ export type Forty = {
   fortyData: FortyData;
 };
 
+export function stringToPoint(kind: string, player?: Player, point?: Point): Point {
+  switch(kind) {
+    case 'LOVE':
+      return love()
+    case 'FIFTEEN':
+      return fifteen()
+    case 'THIRTY':
+      return thirty()
+    case 'FORTY':
+      if(player !== undefined && point !== undefined) {
+        return forty(player, point)
+      }
+      break;
+    default:
+      return love()
+  }
+  return love()
+}
+
 export const point = (): Point => ( love() )
 
 export const love = (): Love => ({
@@ -37,7 +56,7 @@ export const thirty = (): Thirty => ({
   kind: 'THIRTY',
 });
 
-const forty = (player: Player, point: Point): Forty => ({
+export const forty = (player: Player, point: Point): Forty => ({
   kind: 'FORTY',
   fortyData: fd(player, point)
 });
