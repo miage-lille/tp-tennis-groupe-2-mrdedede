@@ -1,30 +1,92 @@
-import { Player } from './player';
+import { Player, playerOne, playerTwo } from './player';
 
-// Surely not the best choice
-export type Point = number;
+export type Point =
+  | Love
+  | Fifteen
+  | Thirty
+  | Forty
+
+export type Love = {
+  kind: 'LOVE';
+};
+
+export type Fifteen = {
+  kind: 'FIFTEEN';
+};
+
+export type Thirty = {
+  kind: 'THIRTY';
+};
+
+export type Forty = {
+  kind: 'FORTY';
+  fortyData: FortyData;
+};
+
+export const point = (): Point => ( love() )
+
+export const love = (): Love => ({
+  kind: 'LOVE',
+});
+
+export const fifteen = (): Fifteen => ({
+  kind: 'FIFTEEN',
+});
+
+export const thirty = (): Thirty => ({
+  kind: 'THIRTY',
+});
+
+const forty = (player: Player, point: Point): Forty => ({
+  kind: 'FORTY',
+  fortyData: fd(player, point)
+});
 
 export type PointsData = {
-  PLAYER_ONE: Point;
-  PLAYER_TWO: Point;
-};
+    playerOne: Point;
+    playerTwo: Point;
+}
 
 export type Points = {
   kind: 'POINTS';
   pointsData: PointsData;
 };
 
+export type FortyData = {
+  player: Player;
+  otherPoint: Point;
+};
+export const fd = (player: Player, otherPoint: Point): FortyData => ({ player: player, otherPoint: otherPoint });
+
+// Exerice 0: Write all type constructors of Points, Deuce, Forty and Advantage types.
 export const points = (
   playerOnePoints: Point,
   playerTwoPoints: Point
 ): Points => ({
   kind: 'POINTS',
   pointsData: {
-    PLAYER_ONE: playerOnePoints,
-    PLAYER_TWO: playerTwoPoints,
+    playerOne: playerOnePoints,
+    playerTwo: playerTwoPoints,
   },
 });
 
-// Exerice 0: Write all type constructors of Points, Deuce, Forty and Advantage types.
+export type Deuce = {
+  kind: 'DEUCE';
+}
+
+export const deuce = (): Deuce => ({
+  kind: 'DEUCE'
+})
+
+export type Advantage = {
+  kind: 'ADVANTAGE';
+  player: Player;
+}
+
+export const advantage = (player: Player): Advantage => ({
+  kind: 'ADVANTAGE',
+  player: player
+})
 
 export type Game = {
   kind: 'GAME';
@@ -36,4 +98,13 @@ export const game = (winner: Player): Game => ({
   player: winner,
 });
 
-export type Score = Points | Game;
+export type Score = Points | Forty | Deuce | Advantage | Game;
+
+// Examples
+
+const s1: PointsData = { playerOne: love(), playerTwo: love() };
+const s2: PointsData = { playerOne: fifteen(), playerTwo: love() };
+const s3: PointsData = { playerOne: thirty(), playerTwo: love() };
+const s4: PointsData = { playerOne: forty(playerOne(), point()), playerTwo: love() };
+const anotherScore: Score = forty(playerTwo(), thirty());
+const startScore: Score = points(love(), love());
