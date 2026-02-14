@@ -1,5 +1,5 @@
-import { Player, stringToPlayer } from './types/player';
-import { Point, PointsData, Score } from './types/score';
+import { isSamePlayer, Player, stringToPlayer } from './types/player';
+import { advantage, deuce, fifteen, forty, FortyData, game, Point, PointsData, Score, thirty } from './types/score';
 import { pipe, Option } from 'effect'
 
 // -------- Tooling functions --------- //
@@ -21,31 +21,45 @@ export const otherPlayer = (player: Player) => {
   }
 };
 // Exercice 1 :
-export const pointToString = (point: Point): string =>
-  'You can use pattern matching with switch case pattern.';
+export const pointToString = (point: Point): string => point.kind;
 
-export const scoreToString = (score: Score): string =>
-  'You can use pattern matching with switch case pattern.';
+export const scoreToString = (score: Score): string => score.kind;
 
-export const scoreWhenDeuce = (winner: Player): Score => {
-  throw new Error('not implemented');
-};
+export const scoreWhenDeuce = (winner: Player): Score => advantage(winner);
 
 export const scoreWhenAdvantage = (
   advantagedPlayed: Player,
   winner: Player
 ): Score => {
-  throw new Error('not implemented');
+  if (isSamePlayer(advantagedPlayed, winner)) return game(winner);
+  return deuce();
 };
 
 export const scoreWhenForty = (
-  currentForty: unknown, // TO UPDATE WHEN WE KNOW HOW TO REPRESENT FORTY
+  currentForty: FortyData,
   winner: Player
 ): Score => {
-  throw new Error('not implemented');
+  if (isSamePlayer(currentForty.player, winner)) return game(winner);
+  return pipe(
+    incrementPoint(currentForty.otherPoint),
+    Option.match({
+      onNone: () => deuce(),
+      onSome: p => forty(currentForty.player, p) as Score
+    })
+  );
 };
 
-
+export const incrementPoint = (point: Point) : Option.Option<Point> => {
+  switch (point.kind) {
+    case 'LOVE':
+      return Option.some(fifteen());
+    case 'FIFTEEN':
+      return Option.some(thirty());
+    case 'THIRTY':
+      return Option.none();
+  }
+  return Option.none();
+};
 
 // Exercice 2
 // Tip: You can use pipe function from Effect to improve readability.
